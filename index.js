@@ -26,6 +26,7 @@ async function run() {
         const orderCollection = database.collection('orders')
         const userCollection = database.collection('users')
         const reviewCollection = database.collection('reviews')
+        const newsCollection = database.collection('news')
 
         app.get('/bikes', async (req, res) => {
             const cursor = bikeCollection.find({});
@@ -52,7 +53,6 @@ async function run() {
             const addNewBike = req.body;
             const result = await bikeCollection.insertOne(addNewBike)
             res.json(result)
-            console.log('new bike hitted')
         })
 
         // Find My Orders
@@ -82,8 +82,6 @@ async function run() {
         app.post('/users', async (req, res) => {
             const addUser = req.body;
             const result = await userCollection.insertOne(addUser);
-
-            console.log(result)
             res.json(result);
         })
 
@@ -93,7 +91,6 @@ async function run() {
             const query = { email: email }
             const user = await userCollection.findOne(query);
             let isAdmin = false;
-            console.log(user.role)
             if (user?.role === 'admin') {
                 isAdmin = true
             }
@@ -123,13 +120,19 @@ async function run() {
         app.post('/reviews', async (req, res) => {
             const uesrReview = req.body;
             const result = await reviewCollection.insertOne(uesrReview);
-            console.log(result)
             res.json(result);
         })
 
         // Find Review
         app.get('/reviews', async (req, res) => {
             const cursor = reviewCollection.find({});
+            const result = await cursor.toArray();
+            res.json(result)
+        })
+
+        // Find News
+        app.get('/news', async (req, res) => {
+            const cursor = newsCollection.find({});
             const result = await cursor.toArray();
             res.json(result)
         })
