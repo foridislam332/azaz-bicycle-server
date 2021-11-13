@@ -25,6 +25,7 @@ async function run() {
         const bikeCollection = database.collection('bikes')
         const orderCollection = database.collection('orders')
         const userCollection = database.collection('users')
+        const reviewCollection = database.collection('reviews')
 
         app.get('/bikes', async (req, res) => {
             const cursor = bikeCollection.find({});
@@ -92,7 +93,8 @@ async function run() {
             const query = { email: email }
             const user = await userCollection.findOne(query);
             let isAdmin = false;
-            if (user.role === 'admin') {
+            console.log(user.role)
+            if (user?.role === 'admin') {
                 isAdmin = true
             }
             res.json({ admin: isAdmin })
@@ -101,7 +103,6 @@ async function run() {
         // PUT User
         app.put('/users', async (req, res) => {
             const user = req.body;
-            console.log(user)
             const filter = { email: user.email };
             const options = { upsert: true };
             const updateDoc = { $set: user };
@@ -115,6 +116,21 @@ async function run() {
             const filter = { email: user.email };
             const updateDoc = { $set: { role: 'admin' } };
             const result = await userCollection.updateOne(filter, updateDoc);
+            res.json(result)
+        })
+
+        // POST Reviews
+        app.post('/reviews', async (req, res) => {
+            const uesrReview = req.body;
+            const result = await reviewCollection.insertOne(uesrReview);
+            console.log(result)
+            res.json(result);
+        })
+
+        // Find Review
+        app.get('/reviews', async (req, res) => {
+            const cursor = reviewCollection.find({});
+            const result = await cursor.toArray();
             res.json(result)
         })
     }
